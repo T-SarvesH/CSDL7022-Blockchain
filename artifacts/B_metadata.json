@@ -1,0 +1,70 @@
+{
+	"compiler": {
+		"version": "0.8.30+commit.73712a01"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "_nameB",
+						"type": "string"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"inputs": [],
+				"name": "printB",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"MultiInher.sol": "B"
+		},
+		"evmVersion": "prague",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"MultiInher.sol": {
+			"keccak256": "0x8737e337795776bba83742fcf103c94eb159c7b6a3fa723bf0e794e321571e86",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://eeecdabbb65282b08939f7ec34d6b5fbd3c60cd87728562972548b74336bd2a7",
+				"dweb:/ipfs/QmakXJYfRLaJ4ehfazVAfbPr9J8TwdeRon2F9Z5kgQVYZQ"
+			]
+		}
+	},
+	"version": 1
+}
