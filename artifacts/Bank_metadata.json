@@ -11,10 +11,57 @@
 				"type": "constructor"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_amount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lockPeriod",
+						"type": "uint256"
+					}
+				],
+				"name": "createFixedDeposit",
+				"outputs": [],
+				"stateMutability": "payable",
+				"type": "function"
+			},
+			{
 				"inputs": [],
 				"name": "deposit",
 				"outputs": [],
 				"stateMutability": "payable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"name": "fixedDeposits",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lockPeriod",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "interestRate",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
 				"type": "function"
 			},
 			{
@@ -28,6 +75,19 @@
 					}
 				],
 				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "clientAddress",
+						"type": "address"
+					}
+				],
+				"name": "grantLoan",
+				"outputs": [],
+				"stateMutability": "nonpayable",
 				"type": "function"
 			},
 			{
@@ -63,6 +123,40 @@
 				"type": "function"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"name": "loans",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "interestRate",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "totalPayable",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "approved",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [],
 				"name": "sendInterest",
 				"outputs": [],
@@ -70,13 +164,7 @@
 				"type": "function"
 			},
 			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "managerAddress",
-						"type": "address"
-					}
-				],
+				"inputs": [],
 				"name": "setManager",
 				"outputs": [
 					{
@@ -134,11 +222,11 @@
 	},
 	"sources": {
 		"Bank.sol": {
-			"keccak256": "0x05c3a6a331eac2685466b9ac31423278de2343a5f81b97b5db661ac22ae9d0ab",
+			"keccak256": "0x700fd2b0daa5bdb9394baf9f24a4a918899ba4ca8a57938f62a071d1c67262c6",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://fae94c00c1cf4e0080967e0facdacda469345eae256290db9cc14b4d9ccbbdd5",
-				"dweb:/ipfs/QmQaRaZbRhwqkNsCcUszcvNgre2XCyKBHyJjQEeLFrGb6M"
+				"bzz-raw://b91eab59fa7cf0d35d379759139348774ad9f9559466ec520b841b7c4aacb26f",
+				"dweb:/ipfs/QmXYjR1dUDKw2wBQPHAdBXEwsPmkb1ysM9APCQniT9KQqD"
 			]
 		}
 	},
