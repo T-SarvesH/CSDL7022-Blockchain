@@ -1,7 +1,12 @@
 // SPDX-License-Identifier: MIT
+
+//Sarvesh Tikekar Roll no: 64
+
 pragma solidity ^0.8.20;
 
 contract Bank {
+
+    //Structs for ease
     struct client_account {
         int client_id;
         address client_address;
@@ -10,7 +15,7 @@ contract Bank {
 
     struct FixedDeposit {
         uint amount;
-        uint lockPeriod;
+        uint256 lockPeriod;
         uint interestRate;
     }
 
@@ -18,6 +23,7 @@ contract Bank {
         uint amount;
         uint interestRate;
         uint totalPayable;
+        uint256 timePeriod;
         bool approved;
     }
 
@@ -29,6 +35,7 @@ contract Bank {
     mapping(address => Loan) public loans;
     bool isManagerSet = false;
 
+    //Some manager modifiers
     modifier onlyManager() {
         require(msg.sender == manager, "Only manager can call this!");
         _;
@@ -59,15 +66,18 @@ contract Bank {
 
     receive() external payable {}
 
+    //Once manager set it can't be changed
     function setManager() public managerSet returns (string memory) {
         manager = payable(msg.sender);
-        return "The manager is now set!" ;
+        return "The manager is now set!";
     }
 
-    function joinAsClient() public payable returns (string memory) {
+    function joinAsClient() public payable returns (client_account memory) {
         interestDate[payable(msg.sender)] = block.timestamp;
-        clients.push(client_account(clientCounter++, msg.sender, address(msg.sender).balance));
-        return "";
+        client_account memory Client = client_account(clientCounter++, msg.sender, address(msg.sender).balance);
+
+        clients.push(Client);
+        return Client;
     }
 
     function deposit() public payable onlyClients {
@@ -90,24 +100,57 @@ contract Bank {
         }
     }
 
-    function createFixedDeposit(uint _amount, uint lockPeriod) public payable onlyClients {
-        require(msg.value == _amount * 1 ether, "Send exact FD amount");
-        uint interestRate = 5;
+    modifier isBeyondLockPeriod(){
 
+        uint lockP = fixedDeposits[address(msg.sender)].lockPeriod;
+
+        //If FD exists and its lockPeriod has expired so the client can access the FD now
+        require(lockP > 0 && lockP < block.timestamp, "Lock period isnt over yet so you need to wait");
+        _;
+    }
+
+    modifier isExactAmount(uint _amount){
+
+        uint amt = fixedDeposits[address(msg.sender)].amount;
+        require(amt == _amount, "Amount sent to FD is not exact");
+        _;
+    }
+
+    function createFixedDeposit(uint _amount, uint lockPeriod) public payable onlyClients returns (FixedDeposit memory){
+
+        uint interestRate = 5;
+        fixedDeposits[msg.sender] = FixedDeposit(_amount, lockPeriod + block.timestamp, interestRate);
+
+        return fixedDeposits[msg.sender];
+
+    }
+
+    function updateFixedDeposit(uint _amount, uint lockPeriod) public payable onlyClients isExactAmount(_amount) isBeyondLockPeriod returns(string memory){
+
+        uint interestRate = 5;
         uint currAmount = fixedDeposits[address(msg.sender)].amount;
 
         fixedDeposits[msg.sender] = FixedDeposit(currAmount + _amount, lockPeriod, interestRate);
+        return "Fixed Deposited Updated";
     }
 
-    function grantLoan(address clientAddress) public onlyManager {
+    modifier doesFDexists(address client){
+        uint amt = fixedDeposits[client].amount;
+        require(amt > 0, "This FD doesnt exist");
+        _;
+    }
+
+    function grantLoan(address clientAddress, uint _timeperiod) public payable onlyManager doesFDexists(clientAddress) returns (uint){
         FixedDeposit memory fd = fixedDeposits[clientAddress];
-        require(fd.amount > 0, "No FD found for this client");
         uint interestRate = 10;
+        uint prevLoanamt = loans[address(clientAddress)].amount;
         uint loanAmount = fd.amount;
-        
-        uint totalPayable = loanAmount + (loanAmount * interestRate / 100);
-        loans[clientAddress] = Loan(loanAmount, interestRate, totalPayable, true);
-        payable(clientAddress).transfer(loanAmount * 1 ether);
+        uint _totalPayable = loans[address(clientAddress)].totalPayable;
+        _totalPayable += (loanAmount + (loanAmount * interestRate / 100));
+
+        loans[clientAddress] = Loan(loanAmount + prevLoanamt, interestRate, _totalPayable, _timeperiod ,true);
+        payable(clientAddress).transfer(loanAmount);
+        return (msg.sender.balance * 1 ether);
     }
 
     function getContractBalance() public view returns (uint) {

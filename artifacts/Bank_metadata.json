@@ -24,7 +24,30 @@
 					}
 				],
 				"name": "createFixedDeposit",
-				"outputs": [],
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "amount",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "lockPeriod",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "interestRate",
+								"type": "uint256"
+							}
+						],
+						"internalType": "struct Bank.FixedDeposit",
+						"name": "",
+						"type": "tuple"
+					}
+				],
 				"stateMutability": "payable",
 				"type": "function"
 			},
@@ -83,11 +106,22 @@
 						"internalType": "address",
 						"name": "clientAddress",
 						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_timeperiod",
+						"type": "uint256"
 					}
 				],
 				"name": "grantLoan",
-				"outputs": [],
-				"stateMutability": "nonpayable",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "payable",
 				"type": "function"
 			},
 			{
@@ -114,9 +148,26 @@
 				"name": "joinAsClient",
 				"outputs": [
 					{
-						"internalType": "string",
+						"components": [
+							{
+								"internalType": "int256",
+								"name": "client_id",
+								"type": "int256"
+							},
+							{
+								"internalType": "address",
+								"name": "client_address",
+								"type": "address"
+							},
+							{
+								"internalType": "uint256",
+								"name": "client_balance_in_ether",
+								"type": "uint256"
+							}
+						],
+						"internalType": "struct Bank.client_account",
 						"name": "",
-						"type": "string"
+						"type": "tuple"
 					}
 				],
 				"stateMutability": "payable",
@@ -148,6 +199,11 @@
 						"type": "uint256"
 					},
 					{
+						"internalType": "uint256",
+						"name": "timePeriod",
+						"type": "uint256"
+					},
+					{
 						"internalType": "bool",
 						"name": "approved",
 						"type": "bool"
@@ -174,6 +230,30 @@
 					}
 				],
 				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_amount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lockPeriod",
+						"type": "uint256"
+					}
+				],
+				"name": "updateFixedDeposit",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "payable",
 				"type": "function"
 			},
 			{
@@ -222,11 +302,11 @@
 	},
 	"sources": {
 		"Bank.sol": {
-			"keccak256": "0x700fd2b0daa5bdb9394baf9f24a4a918899ba4ca8a57938f62a071d1c67262c6",
+			"keccak256": "0xaa0f899dc1ff61e73e456158cf2223ea4f303918d90fb8625cee7f38155b15d4",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://b91eab59fa7cf0d35d379759139348774ad9f9559466ec520b841b7c4aacb26f",
-				"dweb:/ipfs/QmXYjR1dUDKw2wBQPHAdBXEwsPmkb1ysM9APCQniT9KQqD"
+				"bzz-raw://b73afe0e26b97f9da2c1e47d01bd64a6027609bc5f79f4f9d619fd0bdc4a2860",
+				"dweb:/ipfs/QmamuW2kzY66Ztyaaodhiua2prCTCSTJstzWYKYsBzSUDU"
 			]
 		}
 	},
