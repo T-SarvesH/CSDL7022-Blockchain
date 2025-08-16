@@ -7,10 +7,10 @@ import './ElectionOfficer.sol';
 contract Voter{
 
     uint immutable startTime = block.timestamp;
-    uint immutable endTime = startTime + 1 weeks;
+    uint immutable endTime = block.timestamp + 1 weeks;
 
-    uint immutable electionStart = endTime + 1 weeks;
-    uint immutable electionEnd = electionStart + 1 days;
+    uint immutable electionStart = block.timestamp + 1 weeks + 1 weeks;
+    uint immutable electionEnd = block.timestamp + 1 weeks + 1 weeks + 1 days;
 
     address public gElect;
     address public electionCommission;
@@ -237,7 +237,8 @@ contract Voter{
     ) {
         uint verified = 0;
         uint voted = 0;
-        mapping(uint => bool) memory constituencyCount;
+        uint[] memory constituencies = new uint[](100); // Assume max 100 constituencies
+        uint constituencyIndex = 0;
         uint uniqueConstituencies = 0;
         
         for (uint i = 1; i < primKey; i++) {
@@ -251,8 +252,19 @@ contract Voter{
                 }
                 
                 uint constituencyId = voterMap[voterAddr].ConstituencyId;
-                if (!constituencyCount[constituencyId]) {
-                    constituencyCount[constituencyId] = true;
+                bool found = false;
+                
+                // Check if constituency already counted
+                for (uint j = 0; j < constituencyIndex; j++) {
+                    if (constituencies[j] == constituencyId) {
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if (!found) {
+                    constituencies[constituencyIndex] = constituencyId;
+                    constituencyIndex++;
                     uniqueConstituencies++;
                 }
             }
@@ -299,7 +311,7 @@ contract Voter{
 
     // Emergency functions for election management
     function emergencyRemoveVoter(address _voterAddress) external {
-        require(e.isElecCommissioner(msg.sender), "Only Election Commissioner can perform this action");
+        require(e.isElecCommissionerAddress(msg.sender), "Only Election Commissioner can perform this action");
         require(voterMap[_voterAddress].id > 0, "Voter not found");
         
         uint voterId = voterMap[_voterAddress].id;
@@ -345,6 +357,12 @@ contract Voter{
     }
 
     constructor (address _ElectionOfficerAddr) {
+        require(_ElectionOfficerAddr != address(0), "Invalid ElectionOfficer address");
         e = ElectionOfficer(_ElectionOfficerAddr);
+    }
+    
+    // Function to check ElectionOfficer connection
+    function getElectionOfficerAddress() external view returns (address) {
+        return address(e);
     }
 }

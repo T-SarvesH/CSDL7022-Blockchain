@@ -27,10 +27,10 @@ contract GeneralElections{
     ElectionOfficer e;
 
     uint public immutable electionStart = block.timestamp + 3 days;
-    uint public immutable electionEnd = electionStart + 1 weeks;
+    uint public immutable electionEnd = block.timestamp + 3 days + 1 weeks;
 
-    uint public immutable bufferStart = electionEnd + 2 days;
-    uint public immutable bufferEnd = bufferStart + 1 weeks;
+    uint public immutable bufferStart = block.timestamp + 3 days + 1 weeks + 2 days;
+    uint public immutable bufferEnd = block.timestamp + 3 days + 1 weeks + 2 days + 1 weeks;
 
     uint public totalVotes = 0;
     bool public isElectionPaused = false;
@@ -151,7 +151,7 @@ contract GeneralElections{
         return totalVotes;
     }
 
-    function getVoterTurnout(uint _constituencyId) external view returns (uint totalVoters, uint totalVotes) {
+    function getVoterTurnout(uint) external view returns (uint voterCount, uint voteCount) {
         // This would need to be implemented in Voter contract
         // For now, returning basic info
         return (0, totalVotes); // Placeholder
@@ -268,12 +268,11 @@ contract GeneralElections{
     }
 
     // Vote verification and audit functions
-    function generateVoteProof(uint _voterId, uint _candidateId) internal pure returns (bytes32) {
+    function generateVoteProof(uint _voterId, uint _candidateId) internal view returns (bytes32) {
         return keccak256(abi.encodePacked(_voterId, _candidateId, block.timestamp));
     }
 
-    function verifyVote(uint _voterId, uint _candidateId, bytes32 _proof) external view returns (bool) {
-        bytes32 expectedProof = generateVoteProof(_voterId, _candidateId);
+    function verifyVote(uint _voterId, uint, bytes32 _proof) external view returns (bool) {
         return voteProofs[_voterId] == _proof && usedProofs[_proof];
     }
 
@@ -287,8 +286,8 @@ contract GeneralElections{
         bytes32 proof
     ) {
         require(_voterId < votes.length, "Vote not found");
-        vote memory v = votes[_voterId];
-        return (v.candidateId, v.timeStamp, voteProofs[v.voterId]);
+        vote memory voteData = votes[_voterId];
+        return (voteData.candidateId, voteData.timeStamp, voteProofs[voteData.voterId]);
     }
 
     function getAllVotes() external view returns (
