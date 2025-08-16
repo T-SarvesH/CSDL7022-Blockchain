@@ -29,7 +29,7 @@ contract Candidate{
     mapping (address => bool) hasWon;
 
     uint immutable regStart = block.timestamp;
-    uint immutable regEnd = regStart + 1 weeks;
+    uint immutable regEnd = block.timestamp + 1 weeks;
     uint public totalCandidates = 0;
     uint totalDeposits;
     uint primKey = 1;
@@ -134,7 +134,7 @@ contract Candidate{
     }
 
     // New functions to support enhanced voting system
-    function getCandidatesByConstituency(uint _constituencyId) external view returns (address[] memory) {
+    function getCandidatesByConstituency(uint _constituencyId) public view returns (address[] memory) {
         uint count = 0;
         
         // First pass: count candidates in constituency
@@ -236,7 +236,7 @@ contract Candidate{
 
     // Emergency functions for election management
     function emergencyRemoveCandidate(address _candidateAddress) external {
-        require(e.isElecCommissioner(msg.sender), "Only Election Commissioner can perform this action");
+        require(e.isElecCommissionerAddress(msg.sender), "Only Election Commissioner can perform this action");
         require(isCandidate[_candidateAddress], "Candidate not found");
         
         // Refund security deposit
@@ -260,16 +260,28 @@ contract Candidate{
         uint totalConstituencies,
         uint totalDepositsCollected
     ) {
-        // Count unique constituencies
-        mapping(uint => bool) memory constituencyCount;
+        // Count unique constituencies using a different approach
         uint uniqueConstituencies = 0;
+        uint[] memory constituencies = new uint[](100); // Assume max 100 constituencies
+        uint constituencyIndex = 0;
         
         for (uint i = 1; i < primKey; i++) {
             address candidateAddr = candidateIds[i];
             if (candidateAddr != address(0)) {
                 uint constituencyId = candidates[candidateAddr].constituencyId;
-                if (!constituencyCount[constituencyId]) {
-                    constituencyCount[constituencyId] = true;
+                bool found = false;
+                
+                // Check if constituency already counted
+                for (uint j = 0; j < constituencyIndex; j++) {
+                    if (constituencies[j] == constituencyId) {
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if (!found) {
+                    constituencies[constituencyIndex] = constituencyId;
+                    constituencyIndex++;
                     uniqueConstituencies++;
                 }
             }
@@ -290,6 +302,17 @@ contract Candidate{
     }
 
     constructor(address _electionOfficerAddr){
+        require(_electionOfficerAddr != address(0), "Invalid ElectionOfficer address");
         e = ElectionOfficer(_electionOfficerAddr);
+    }
+    
+    // Function to check ElectionOfficer connection
+    function getElectionOfficerAddress() external view returns (address) {
+        return address(e);
+    }
+    
+    // Getter function for isCandidate mapping
+    function isCandidateRegistered(address _candidateAddress) external view returns (bool) {
+        return isCandidate[_candidateAddress];
     }
 }

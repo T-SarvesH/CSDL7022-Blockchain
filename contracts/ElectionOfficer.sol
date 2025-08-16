@@ -5,10 +5,10 @@ contract ElectionOfficer{
 
     //Timestart and Timeend for a limited registration window (Will not change even if multiple contract instances are deployed)
     uint immutable timeStart = block.timestamp;
-    uint immutable timeEnd = timeStart + 3 days;
+    uint immutable timeEnd = block.timestamp + 3 days;
 
-    uint immutable electionStart = timeEnd + 1 weeks;
-    uint immutable electionEnd = electionStart + 1 days;
+    uint immutable electionStart = block.timestamp + 3 days + 1 weeks;
+    uint immutable electionEnd = block.timestamp + 3 days + 1 weeks + 1 days;
 
     struct electionOfficer{
 
