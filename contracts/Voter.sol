@@ -7,10 +7,10 @@ import './ElectionOfficer.sol';
 contract Voter{
 
     uint immutable startTime = block.timestamp;
-    uint immutable endTime = block.timestamp + 1 weeks;
+    uint immutable endTime = block.timestamp + 10 minutes ;
 
-    uint immutable electionStart = block.timestamp + 1 weeks + 1 weeks;
-    uint immutable electionEnd = block.timestamp + 1 weeks + 1 weeks + 1 days;
+    uint immutable electionStart = block.timestamp + 10 minutes;
+    uint immutable electionEnd = block.timestamp + 15 minutes;
 
     address public gElect;
     address public electionCommission;

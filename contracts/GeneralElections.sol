@@ -26,11 +26,11 @@ contract GeneralElections{
     Candidate c;
     ElectionOfficer e;
 
-    uint public immutable electionStart = block.timestamp + 3 days;
-    uint public immutable electionEnd = block.timestamp + 3 days + 1 weeks;
+    uint public immutable electionStart = block.timestamp + 10 minutes;
+    uint public immutable electionEnd = block.timestamp + 15 minutes;
 
-    uint public immutable bufferStart = block.timestamp + 3 days + 1 weeks + 2 days;
-    uint public immutable bufferEnd = block.timestamp + 3 days + 1 weeks + 2 days + 1 weeks;
+    uint public immutable bufferStart = block.timestamp + 17 minutes;
+    uint public immutable bufferEnd = block.timestamp + 22 minutes;
 
     uint public totalVotes = 0;
     bool public isElectionPaused = false;

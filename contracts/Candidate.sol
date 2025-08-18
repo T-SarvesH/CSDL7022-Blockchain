@@ -29,7 +29,7 @@ contract Candidate{
     mapping (address => bool) hasWon;
 
     uint immutable regStart = block.timestamp;
-    uint immutable regEnd = block.timestamp + 1 weeks;
+    uint immutable regEnd = block.timestamp + 10 minutes;
     uint public totalCandidates = 0;
     uint totalDeposits;
     uint primKey = 1;
