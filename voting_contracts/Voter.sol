@@ -2,7 +2,6 @@
 pragma solidity ^0.8.20;
 
 //For voter based data model and its methods
-import './Candidate.sol';
 import './ElectionOfficer.sol';
 
 contract Voter{
@@ -12,6 +11,9 @@ contract Voter{
 
     uint immutable electionStart = endTime + 1 weeks;
     uint immutable electionEnd = electionStart + 1 days;
+
+    address public gElect;
+    address public electionCommission;
 
     ElectionOfficer e;
     
@@ -27,12 +29,13 @@ contract Voter{
         bool hasVoted;
         bool hasRegistered;
         bool isAllowedToVote; // This would be verified later by the respective Election officer
-        int registeredVoteTo; //Contains the id of the candidate the voter has voted
     }
 
     mapping(address => voter) voterMap;
-    address [] voterAddresses;
-    int public voterCount = 0;
+    mapping (uint => address) voterIds;
+
+    uint public voterCount = 0;
+    uint public primKey=1;
 
     // From ElectionOfficer Module
     modifier registrationOpen(){
@@ -43,6 +46,8 @@ contract Voter{
 
     modifier isOfficeFromSameConstituency(address officerAddress, address voterAddress){
         
+        require(voterMap[voterAddress].id > 0, "Voter not found");
+
         require(
             e.isElecOfficer(officerAddress) 
             && e.getOfficerByAddress(officerAddress).allotedConstituency == voterMap[voterAddress].ConstituencyId, 
@@ -63,19 +68,33 @@ contract Voter{
         require(!voterMap[voterAddress].isAllowedToVote, "Voter is already verified");
         _;
     }   
+    
+    modifier isVoterRegistered(address voterAddress){
 
-    function registerAsVoter(uint _id, string calldata _name,
+        require(!voterMap[voterAddress].hasRegistered, "Voter is already registered");
+        _;  
+    }
+
+    modifier fromGeneralElections(){
+
+        require(msg.sender == gElect, "This can be called only from General Elections");
+        _;
+    }
+
+    function registerAsVoter(string calldata _name,
         uint _age,
         bytes12 _aadharNumber,
         string memory _voterIdNumber,
-        uint _ConstituencyId) public registrationOpen returns (string memory){
+        uint _ConstituencyId) public registrationOpen isVoterRegistered(address(msg.sender)) returns (string memory){
 
             bytes32 hashedAadhar = keccak256(abi.encodePacked(_aadharNumber));
             bytes32 hashedVoterId = keccak256(abi.encodePacked(_voterIdNumber));
             
-            voter memory v = voter(_id, _name, _age, hashedAadhar, hashedVoterId, _ConstituencyId, false, true, false, -1);
+            voter memory v = voter(primKey, _name, _age, hashedAadhar, hashedVoterId, _ConstituencyId, false, true, false);
             voterMap[address(msg.sender)] = v;
-            voterAddresses.push(address(msg.sender));
+            voterIds[primKey] = address(msg.sender);
+
+            ++primKey;
             ++voterCount;
 
             return "The voter is registered successfully. Now he awaits for approval";
@@ -98,6 +117,44 @@ contract Voter{
             }
         
             return decision? "Voter Successfully verified and can vote": "Voter not registered as not following the specified rules";
+    }
+
+    //External functions (Only callable by general election contract)
+    function isVoterAllowedToVote(uint _voterId) view external fromGeneralElections returns (bool){
+
+        address voterAddress = voterIds[_voterId];
+        require(voterAddress != address(0) && voterMap[voterAddress].id == _voterId, "Voter not found");
+
+        return voterMap[voterAddress].isAllowedToVote;
+    }
+
+    function getVoterConstituency(uint _voterId) view external fromGeneralElections returns (uint){
+
+        address voterAddress = voterIds[_voterId];
+        require(voterAddress != address(0) && voterMap[voterAddress].id == _voterId, "Voter not found");
+
+        return voterMap[voterAddress].ConstituencyId;
+    }
+
+    function hasVoterVoted(uint _voterId) view external fromGeneralElections returns (bool){
+
+        address voterAddress = voterIds[_voterId];
+        require(voterAddress != address(0) && voterMap[voterAddress].id == _voterId, "Voter not found");
+        return voterMap[voterAddress].hasVoted;
+    }
+
+    function updateVoterAfterVote(uint _voterId) external fromGeneralElections{
+
+        address voterAddress = voterIds[_voterId];
+        require(voterAddress != address(0) && voterMap[voterAddress].id == _voterId, "Voter not found");
+        voterMap[voterAddress].hasVoted = true;
+    }
+
+    function setGeneralElection(address _generalElection) external {
+        require(e.isElecCommissioner(), "Only the election Commissioner can perform this");
+        require(gElect == address(0), "Election already set");
+        gElect = _generalElection;
+        electionCommission = msg.sender;
     }
 
     constructor (address _ElectionOfficerAddr) {

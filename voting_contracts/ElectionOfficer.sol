@@ -24,7 +24,9 @@ contract ElectionOfficer{
 
     address [] electionOfficers;
     
-    uint electionOfficerCount = 0;
+    uint public electionOfficerCount = 0;
+    uint public primKey = 1;
+
     address public immutable electionCommissioner;
 
     event OfficerAssigned(address officer, uint constituency);
@@ -41,6 +43,10 @@ contract ElectionOfficer{
         _;
     }
 
+    function isElecCommissioner() public view returns (bool){
+
+        return msg.sender == electionCommissioner;
+    }
 
     function isElecOfficer(address officerAddress) public view returns (bool){
 
@@ -48,14 +54,13 @@ contract ElectionOfficer{
     }
     
     //Elect election officers (Permission: Election Commissioner)
-    function electElectionOfficers(address officerAddress, string calldata name, uint id, uint allotedConstituency) public onlyElectionCommissioner registrationOpen{
+    function electElectionOfficers(address officerAddress, string calldata name, uint allotedConstituency) public onlyElectionCommissioner registrationOpen{
 
-        require(id > 0, "Officer ID must be positive");
         require(allotedConstituency > 0, "Constituency must be positive");
         require(!constituencyMapping[allotedConstituency], "This constituency already has a officer alloted");
         require(!isOfficer[officerAddress], "This officer is already elected");
 
-        electionOfficer memory eo = electionOfficer(name, id, allotedConstituency);
+        electionOfficer memory eo = electionOfficer(name, primKey++, allotedConstituency);
         Map[officerAddress] = eo;
         isOfficer[officerAddress] = true;
         constituencyMapping[allotedConstituency] = true;
